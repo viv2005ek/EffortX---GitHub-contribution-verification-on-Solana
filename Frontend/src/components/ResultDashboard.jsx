@@ -4,11 +4,8 @@ import { ExternalLink, GitBranch, User, Calendar, CheckCircle2, AlertCircle } fr
 import ScoreCard from './ScoreCard';
 import InsightCards from './InsightCards';
 import StoreProofButton from './StoreProofButton';
-import OnChainProfilePanel from './OnChainProfilePanel';
-import { useSolana } from '../context/SolanaContext.jsx';
 
 const ResultDashboard = ({ data }) => {
-  const { isWalletConnected } = useSolana();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
@@ -64,9 +61,9 @@ const ResultDashboard = ({ data }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-[#161b22] border border-[#30363d] p-6 md:p-8 rounded-xl relative overflow-hidden shadow-lg"
+            className="glass-card p-6 md:p-8 rounded-2xl relative overflow-hidden shadow-2xl border border-white/5"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
               <CheckCircle2 className="w-40 h-40 text-accent-green" />
             </div>
 
@@ -113,99 +110,53 @@ const ResultDashboard = ({ data }) => {
           <InsightCards data={data} />
         </div>
 
-        {/* Right Column: Score Card + On-Chain Panel */}
+        {/* Right Column: Score Card + Engineering Metrics */}
         <div className="space-y-6">
           <ScoreCard score={data.effortScore} />
 
-          {/* On-Chain Profile Panel — only shown when wallet connected */}
-          {isWalletConnected && <OnChainProfilePanel />}
-
-          {/* Engineering Metrics (always shown, moved below on-chain panel) */}
-          {!isWalletConnected && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-[#161b22] border border-[#30363d] p-6 rounded-xl shadow-lg"
-            >
-              <h4 className="text-[12px] font-bold text-white uppercase tracking-wide mb-6">Engineering Metrics</h4>
-              <div className="space-y-5">
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Code Consistency</span>
-                    <span className="text-accent-green">88%</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-accent-green h-full w-[88%] rounded-full shadow-[0_0_8px_#2ea043]" />
-                  </div>
+          {/* Engineering Metrics — always shown */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass-card p-6 rounded-2xl border border-white/5 shadow-2xl"
+          >
+            <h4 className="text-[12px] font-bold text-white uppercase tracking-wide mb-6">Engineering Metrics</h4>
+            <div className="space-y-5">
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-[12px] font-semibold">
+                  <span className="text-[#8b949e]">Code Consistency</span>
+                  <span className="text-accent-green">88%</span>
                 </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Maintainability</span>
-                    <span className="text-[#3fb950]">High</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#3fb950] h-full w-[94%] rounded-full shadow-[0_0_8px_#3fb950]" />
-                  </div>
-                </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Security Awareness</span>
-                    <span className="text-[#2ea043]">Optimized</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#2ea043] h-full w-[82%] rounded-full" />
-                  </div>
-                </div>
-                <div className="pt-5 border-t border-[#30363d] mt-2">
-                  <p className="text-[12px] text-[#8b949e] leading-relaxed">
-                    Metrics are generated via multi-layered architectural analysis of the submitted diff.
-                  </p>
+                <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
+                  <div className="bg-accent-green h-full w-[88%] rounded-full shadow-[0_0_8px_#2ea043]" />
                 </div>
               </div>
-            </motion.div>
-          )}
-
-          {/* Engineering metrics shown below on-chain panel when connected */}
-          {isWalletConnected && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-[#161b22] border border-[#30363d] p-6 rounded-xl shadow-lg"
-            >
-              <h4 className="text-[12px] font-bold text-white uppercase tracking-wide mb-6">Engineering Metrics</h4>
-              <div className="space-y-5">
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Code Consistency</span>
-                    <span className="text-accent-green">88%</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-accent-green h-full w-[88%] rounded-full shadow-[0_0_8px_#2ea043]" />
-                  </div>
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-[12px] font-semibold">
+                  <span className="text-[#8b949e]">Maintainability</span>
+                  <span className="text-[#3fb950]">High</span>
                 </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Maintainability</span>
-                    <span className="text-[#3fb950]">High</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#3fb950] h-full w-[94%] rounded-full shadow-[0_0_8px_#3fb950]" />
-                  </div>
-                </div>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center text-[12px] font-semibold">
-                    <span className="text-[#8b949e]">Security Awareness</span>
-                    <span className="text-[#2ea043]">Optimized</span>
-                  </div>
-                  <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#2ea043] h-full w-[82%] rounded-full" />
-                  </div>
+                <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#3fb950] h-full w-[94%] rounded-full shadow-[0_0_8px_#3fb950]" />
                 </div>
               </div>
-            </motion.div>
-          )}
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-[12px] font-semibold">
+                  <span className="text-[#8b949e]">Security Awareness</span>
+                  <span className="text-[#2ea043]">Optimized</span>
+                </div>
+                <div className="w-full bg-[#0d1117] border border-[#30363d] h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#2ea043] h-full w-[82%] rounded-full" />
+                </div>
+              </div>
+              <div className="pt-5 border-t border-[#30363d] mt-2">
+                <p className="text-[12px] text-[#8b949e] leading-relaxed">
+                  Metrics are generated via multi-layered architectural analysis of the submitted diff.
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

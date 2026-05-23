@@ -45,8 +45,26 @@ const HowItWorks = () => {
         </motion.div>
 
         <div className="relative">
-          {/* Connecting Line (Desktop) */}
-          <div className="hidden lg:block absolute top-1/8 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2" />
+          {/* Connecting Wave Line (Desktop) */}
+          <div className="hidden lg:block absolute top-8 left-0 w-full -translate-y-1/2 z-0 h-24 overflow-visible pointer-events-none">
+            <svg viewBox="0 0 1000 100" preserveAspectRatio="none" className="w-full h-full text-[#3fb950] opacity-40">
+              <path
+                d="M 0 50 
+                   C 33 50, 66 -10, 100 50 
+                   C 166 110, 233 -10, 300 50 
+                   C 366 110, 433 -10, 500 50 
+                   C 566 110, 633 -10, 700 50 
+                   C 766 110, 833 -10, 900 50 
+                   C 933 110, 966 50, 1000 50"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                vectorEffect="non-scaling-stroke"
+                strokeDasharray="12 8"
+                className="animate-[wave-flow_3s_linear_infinite]"
+              />
+            </svg>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 relative z-10">
             {steps.map((step, index) => (

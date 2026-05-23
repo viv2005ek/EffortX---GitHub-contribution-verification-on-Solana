@@ -9,6 +9,60 @@ import { explorerAccountUrl } from '../solana/config.js';
 // WalletButton — premium, minimal Phantom wallet button
 // ============================================================
 
+const RippleButton = ({ children, onClick, className, whileHover, whileTap }) => {
+  const [ripples, setRipples] = useState([]);
+
+  const createRipple = (e) => {
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    const newRipple = {
+      x,
+      y,
+      size,
+      id: Date.now()
+    };
+
+    setRipples((prev) => [...prev, newRipple]);
+  };
+
+  const removeRipple = (id) => {
+    setRipples((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  return (
+    <motion.button
+      whileHover={whileHover}
+      whileTap={whileTap}
+      className={`relative overflow-hidden ${className}`}
+      onClick={(e) => {
+        createRipple(e);
+        if (onClick) onClick(e);
+      }}
+    >
+      {children}
+      <span className="absolute inset-0 pointer-events-none z-0">
+        {ripples.map((ripple) => (
+          <span
+            key={ripple.id}
+            style={{
+              left: ripple.x,
+              top: ripple.y,
+              width: ripple.size,
+              height: ripple.size,
+            }}
+            className="absolute bg-white/20 rounded-full animate-ripple pointer-events-none"
+            onAnimationEnd={() => removeRipple(ripple.id)}
+          />
+        ))}
+      </span>
+    </motion.button>
+  );
+};
+
 export default function WalletButton() {
   const { wallet, profile, profileLoading, isWalletConnected } = useSolana();
   const { setVisible } = useWalletModal();
@@ -46,15 +100,17 @@ export default function WalletButton() {
   // ——— NOT CONNECTED ———
   if (!isWalletConnected) {
     return (
-      <motion.button
-        whileHover={{ scale: 1.02 }}
+      <RippleButton
+        whileHover={{ scale: 1.03, boxShadow: "0 0 15px rgba(46, 160, 67, 0.25)" }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setVisible(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#30363d] border border-[#30363d] hover:bg-accent-green/10 hover:border-accent-green/30 text-white text-sm font-bold transition-all duration-200"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#30363d] border border-[#30363d] hover:bg-accent-green/10 hover:border-accent-green/30 text-white text-sm font-bold transition-all duration-200 cursor-pointer"
       >
-        <Wallet className="w-4 h-4 text-accent-green" />
-        Connect Wallet
-      </motion.button>
+        <div className="flex items-center gap-2 relative z-10 pointer-events-none">
+          <Wallet className="w-4 h-4 text-accent-green animate-pulse" />
+          Connect Wallet
+        </div>
+      </RippleButton>
     );
   }
 
@@ -62,10 +118,10 @@ export default function WalletButton() {
   return (
     <div className="relative" ref={menuRef}>
       <motion.button
-        whileHover={{ scale: 1.01 }}
+        whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(46, 160, 67, 0.25)" }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setMenuOpen((o) => !o)}
-        className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-[#30363d] border border-accent-green/30 hover:bg-accent-green/10 text-white text-sm font-bold transition-all duration-200"
+        className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-[#30363d] border border-accent-green/30 hover:bg-accent-green/10 text-white text-sm font-bold transition-all duration-200 cursor-pointer"
       >
         {/* Online dot */}
         <span className="relative flex h-2 w-2">
@@ -94,7 +150,7 @@ export default function WalletButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-64 bg-[#161b22] rounded-2xl border border-[#30363d] shadow-2xl z-50 overflow-hidden"
+            className="absolute right-0 top-full mt-2 w-64 bg-[#161b22]/90 backdrop-blur-md rounded-2xl border border-[#30363d] shadow-2xl z-50 overflow-hidden"
           >
             {/* Profile header */}
             <div className="px-4 pt-4 pb-3 border-b border-[#30363d]">
@@ -124,7 +180,7 @@ export default function WalletButton() {
             <div className="py-2">
               <button
                 onClick={handleCopy}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-text-main/70 hover:text-white hover:bg-[#30363d] transition-all"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-text-main/70 hover:text-white hover:bg-[#30363d] transition-all cursor-pointer"
               >
                 {copied ? (
                   <CheckCheck className="w-4 h-4 text-accent-green" />
@@ -149,7 +205,7 @@ export default function WalletButton() {
 
               <button
                 onClick={handleDisconnect}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Disconnect
