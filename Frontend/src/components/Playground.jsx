@@ -398,9 +398,13 @@ export default function Playground() {
         setIsLoading(false);
         const toastId = toast.loading(`Transferring ${cost} ECOIN...`);
         try {
-          await transferEcoins(wallet, ADMIN_WALLET, cost);
-          toast.success(`Transferred ${cost} ECOIN successfully!`, { id: toastId });
-          refreshProfile();
+          if (wallet.publicKey.toBase58() !== ADMIN_WALLET) {
+            await transferEcoins(wallet, ADMIN_WALLET, cost);
+            toast.success(`Transferred ${cost} ECOIN successfully!`, { id: toastId });
+            refreshProfile();
+          } else {
+            toast.success(`Admin Bypass: Free transaction`, { id: toastId });
+          }
         } catch (txError) {
           console.error("Transfer error:", txError);
           const readableError = parseBlockchainError(txError);

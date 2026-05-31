@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useSolana } from '../context/SolanaContext.jsx';
-import { Wallet, ChevronDown, LogOut, ExternalLink, Copy, CheckCheck, Coins } from 'lucide-react';
+import { Wallet, ChevronDown, LogOut, ExternalLink, Copy, CheckCheck, Coins, AlertCircle } from 'lucide-react';
 import { explorerAccountUrl } from '../solana/config.js';
+import { checkGithubAuthStatus, getGithubAuthUrl } from '../services/api';
 
 // ============================================================
 // WalletButton — premium, minimal Phantom wallet button
@@ -68,7 +69,16 @@ export default function WalletButton() {
   const { setVisible } = useWalletModal();
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [ghAuthStatus, setGhAuthStatus] = useState(null);
   const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (profile?.githubUsername) {
+      checkGithubAuthStatus(profile.githubUsername).then(setGhAuthStatus);
+    } else {
+      setGhAuthStatus(null);
+    }
+  }, [profile]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -124,10 +134,17 @@ export default function WalletButton() {
         className="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-[#30363d] border border-accent-green/30 hover:bg-accent-green/10 text-white text-sm font-bold transition-all duration-200 cursor-pointer"
       >
         {/* Online dot */}
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-green" />
-        </span>
+        {ghAuthStatus === false ? (
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500" />
+          </span>
+        ) : (
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-green" />
+          </span>
+        )}
 
         {profileLoading ? (
           <span className="text-text-main/60 text-xs">Loading...</span>
@@ -172,6 +189,34 @@ export default function WalletButton() {
                   <Coins className="w-3.5 h-3.5 text-accent-green" />
                   <span className="text-xs text-accent-green font-bold">{profile.ecoinBalance} ECOIN</span>
                   <span className="ml-auto text-[10px] text-text-main/30">{profile.totalProofs} proofs</span>
+                </div>
+              )}
+
+              {/* GitHub Auth Status */}
+              {profile && (
+                <div className="mt-2 flex items-center gap-2 px-2 py-1.5 rounded-lg border bg-[#161b22] border-[#30363d]">
+                  {ghAuthStatus === false ? (
+                    <>
+                      <AlertCircle className="w-3.5 h-3.5 text-yellow-500" />
+                      <span className="text-xs text-yellow-500 font-bold">GitHub Auth Required</span>
+                      <button 
+                        onClick={async () => {
+                          const { url } = await getGithubAuthUrl();
+                          if (url) window.location.href = url;
+                        }} 
+                        className="ml-auto text-[10px] bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-500 px-2 py-0.5 rounded cursor-pointer transition-colors font-bold"
+                      >
+                        Reconnect
+                      </button>
+                    </>
+                  ) : ghAuthStatus === true ? (
+                    <>
+                      <CheckCheck className="w-3.5 h-3.5 text-accent-green" />
+                      <span className="text-xs text-accent-green font-bold">GitHub Authenticated</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-text-main/50 font-bold px-1">Checking GitHub...</span>
+                  )}
                 </div>
               )}
             </div>

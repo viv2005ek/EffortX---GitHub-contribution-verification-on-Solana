@@ -85,3 +85,17 @@ exports.githubAuth = async (req, res) => {
     res.status(500).json({ success: false, error: 'Authentication failed', details: error.message });
   }
 };
+
+exports.checkGithubStatus = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const redisClient = getRedisClient();
+    if (!redisClient) {
+      return res.json({ authenticated: false });
+    }
+    const token = await redisClient.get(`github_token:${username}`);
+    res.json({ authenticated: !!token });
+  } catch (error) {
+    res.json({ authenticated: false });
+  }
+};

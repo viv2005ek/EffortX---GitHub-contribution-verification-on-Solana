@@ -198,6 +198,11 @@ function AppContent() {
   useEffect(() => {
     if (githubAuthUsername && profileChecked) {
       if (profile && profile.githubUsername) {
+        if (profile.githubUsername.toLowerCase() !== githubAuthUsername.toLowerCase()) {
+          toast.error(`GitHub Mismatch! You authenticated as @${githubAuthUsername}, but your on-chain profile is strictly mapped to @${profile.githubUsername}.`);
+          setGithubAuthUsername(null);
+          return;
+        }
         // User already has an on-chain profile mapped. Do not show modal.
         // We just refreshed their GitHub token in the backend.
         setGithubAuthUsername(null);

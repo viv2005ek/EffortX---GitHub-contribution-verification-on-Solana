@@ -40,4 +40,13 @@ export const sendReportToGithub = async (githubUrl, reportMarkdown, githubUserna
   return response.data;
 };
 
+export const checkGithubAuthStatus = async (username) => {
+  try {
+    const response = await api.get(`/auth/github/status/${username}`);
+    return response.data.authenticated;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default api;

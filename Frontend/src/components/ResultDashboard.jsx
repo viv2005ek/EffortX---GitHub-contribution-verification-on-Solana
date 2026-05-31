@@ -30,10 +30,11 @@ const ResultDashboard = ({ data }) => {
       return;
     }
 
-    // Cost logic: 20-40 coins based on score length/complexity
-    const cost = Math.max(20, Math.min(40, Math.floor(data.effortScore / 2.5)));
+    // Cost logic: 10-20 coins based on score, but if rewardCoins < 10, charge 5
+    const baseCost = Math.max(10, Math.min(20, Math.floor(data.effortScore / 5)));
+    const cost = data.rewardCoins < 10 ? 5 : baseCost;
 
-    if (profile.ecoinBalance < cost) {
+    if (wallet.publicKey.toBase58() !== ADMIN_WALLET && profile.ecoinBalance < cost) {
       toast.error(`Insufficient balance. You need ${cost} ECOIN to send this report to GitHub.`);
       return;
     }
@@ -42,10 +43,14 @@ const ResultDashboard = ({ data }) => {
     const toastId = toast.loading(`Transferring ${cost} ECOIN & Sending Report...`);
 
     try {
-      // 1. Charge coins
-      await transferEcoins(wallet, ADMIN_WALLET, cost);
-      toast.success(`Transferred ${cost} ECOIN`, { id: toastId });
-      refreshProfile();
+      // 1. Charge coins (bypass for admin)
+      if (wallet.publicKey.toBase58() !== ADMIN_WALLET) {
+        await transferEcoins(wallet, ADMIN_WALLET, cost);
+        toast.success(`Transferred ${cost} ECOIN`, { id: toastId });
+        refreshProfile();
+      } else {
+        toast.success(`Admin Bypass: Free transaction`, { id: toastId });
+      }
 
       // 2. Format markdown
       const reportMarkdown = `
@@ -81,7 +86,7 @@ ${data.weaknesses.map(w => `- ${w}`).join('\n')}
     } catch (error) {
       console.error(error);
       const isAuthError = error.response?.status === 401 || error.response?.data?.errorType === 'AUTH_REQUIRED';
-      
+
       if (isAuthError) {
         toast.error('GitHub session expired. Redirecting to authenticate...', { id: toastId });
         try {
@@ -94,7 +99,27 @@ ${data.weaknesses.map(w => `- ${w}`).join('\n')}
           toast.error('Failed to get GitHub Auth URL', { id: toastId });
         }
       } else {
-        toast.error('Failed to send report. ' + (error.response?.data?.error || error.message || ''), { id: toastId });
+        const errorText = error.response?.data?.error || error.message || '';
+
+        if (errorText.includes('Permission Error (404)') || errorText.includes('Permission Error (403)')) {
+          toast.error(
+            <div className="flex flex-col gap-2">
+              <span className="font-bold">App not installed on this repo!</span>
+              <span className="text-sm">EffortX must be installed on your repository to post comments.</span>
+              <a
+                href="https://github.com/apps/effortx-analyzer/installations/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 px-3 py-1.5 bg-[#2ea043] hover:bg-[#3fb950] text-white text-xs font-bold rounded-md text-center transition-colors"
+              >
+                Install EffortX App
+              </a>
+            </div>,
+            { id: toastId, duration: 10000 }
+          );
+        } else {
+          toast.error('Failed to send report. ' + errorText, { id: toastId });
+        }
       }
     } finally {
       setIsSending(false);
@@ -135,28 +160,14 @@ ${data.weaknesses.map(w => `- ${w}`).join('\n')}
         <div className="flex flex-wrap gap-3">
           <StoreProofButton analysisData={data} />
           
-          {isAuthorMismatch ? (
-            <button
-              disabled
-              className="px-5 py-2.5 rounded-lg bg-[#161b22] border border-[#30363d] text-[14px] font-semibold text-[#8b949e] flex items-center gap-2 cursor-not-allowed shadow-sm"
-              title={`This commit belongs to @${commitAuthor}, not @${myUsername}`}
-            >
-              <MessageSquare className="w-4 h-4" />
-              Send to GitHub
-              <span className="px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#f85149]/30 text-[10px] font-bold text-[#f85149] uppercase">
-                Author Mismatch
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={handleSendToGithub}
-              disabled={isSending}
-              className="px-5 py-2.5 rounded-lg bg-accent-green text-black font-black hover:bg-[#3fb950] transition-all text-[14px] flex items-center gap-2 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
-              Send to GitHub
-            </button>
-          )}
+          <button
+            onClick={handleSendToGithub}
+            disabled={isSending}
+            className="px-5 py-2.5 rounded-lg bg-accent-green text-black font-black hover:bg-[#3fb950] transition-all text-[14px] flex items-center gap-2 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
+            Send to GitHub
+          </button>
 
           <a
             href={`https://github.com/${data.author}/${data.repository}/commit/${data.commitHash}`}
