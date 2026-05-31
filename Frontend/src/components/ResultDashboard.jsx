@@ -1,11 +1,105 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, GitBranch, User, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ExternalLink, GitBranch, User, Calendar, CheckCircle2, AlertCircle, MessageSquare, Loader2 } from 'lucide-react';
 import ScoreCard from './ScoreCard';
 import InsightCards from './InsightCards';
 import StoreProofButton from './StoreProofButton';
+import { useSolana } from '../context/SolanaContext';
+import { transferEcoins } from '../solana/program';
+import { sendReportToGithub, getGithubAuthUrl } from '../services/api';
+import toast from 'react-hot-toast';
+
+const ADMIN_WALLET = 'GNN25gvBm4LZ9sWFBqpDKtYFtpeyT9krJtPpU4myEpJP';
 
 const ResultDashboard = ({ data }) => {
+  const { wallet, profile, refreshProfile } = useSolana();
+  const [isSending, setIsSending] = React.useState(false);
+
+  const commitAuthor = data?.author || '';
+  const myUsername = profile?.githubUsername || '';
+  const isAuthorMismatch = !!(commitAuthor && myUsername && commitAuthor.toLowerCase() !== myUsername.toLowerCase());
+
+  const handleSendToGithub = async () => {
+    if (!profile) {
+      toast.error('Please create an on-chain profile first.');
+      return;
+    }
+
+    if (!profile.githubUsername) {
+      toast.error('GitHub username not found in profile.');
+      return;
+    }
+
+    // Cost logic: 20-40 coins based on score length/complexity
+    const cost = Math.max(20, Math.min(40, Math.floor(data.effortScore / 2.5)));
+
+    if (profile.ecoinBalance < cost) {
+      toast.error(`Insufficient balance. You need ${cost} ECOIN to send this report to GitHub.`);
+      return;
+    }
+
+    setIsSending(true);
+    const toastId = toast.loading(`Transferring ${cost} ECOIN & Sending Report...`);
+
+    try {
+      // 1. Charge coins
+      await transferEcoins(wallet, ADMIN_WALLET, cost);
+      toast.success(`Transferred ${cost} ECOIN`, { id: toastId });
+      refreshProfile();
+
+      // 2. Format markdown
+      const reportMarkdown = `
+## 🧠 EffortX AI Analysis Report
+
+**Contribution Category:** ${data.contributionCategory}
+**Effort Score:** ${data.effortScore}/100
+**Complexity:** ${data.complexity}/100
+
+### 📝 Summary
+${data.summary}
+
+### ✨ Strengths
+${data.strengths.map(s => `- ${s}`).join('\n')}
+
+### 🛠️ Development Insights
+${data.weaknesses.map(w => `- ${w}`).join('\n')}
+
+---
+*This is an automated report generated through EffortX.*
+      `.trim();
+
+      // 3. Send to backend
+      const res = await sendReportToGithub(data.githubUrl, reportMarkdown, profile.githubUsername);
+      if (res.success) {
+        toast.success(
+          <span>
+            Report sent! <a href={res.commentUrl} target="_blank" rel="noopener noreferrer" className="underline">View Comment</a>
+          </span>,
+          { id: toastId, duration: 5000 }
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      const isAuthError = error.response?.status === 401 || error.response?.data?.errorType === 'AUTH_REQUIRED';
+      
+      if (isAuthError) {
+        toast.error('GitHub session expired. Redirecting to authenticate...', { id: toastId });
+        try {
+          const { url } = await getGithubAuthUrl();
+          if (url) {
+            window.location.href = url;
+          }
+        } catch (authErr) {
+          console.error(authErr);
+          toast.error('Failed to get GitHub Auth URL', { id: toastId });
+        }
+      } else {
+        toast.error('Failed to send report. ' + (error.response?.data?.error || error.message || ''), { id: toastId });
+      }
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
@@ -40,6 +134,29 @@ const ResultDashboard = ({ data }) => {
 
         <div className="flex flex-wrap gap-3">
           <StoreProofButton analysisData={data} />
+          
+          {isAuthorMismatch ? (
+            <button
+              disabled
+              className="px-5 py-2.5 rounded-lg bg-[#161b22] border border-[#30363d] text-[14px] font-semibold text-[#8b949e] flex items-center gap-2 cursor-not-allowed shadow-sm"
+              title={`This commit belongs to @${commitAuthor}, not @${myUsername}`}
+            >
+              <MessageSquare className="w-4 h-4" />
+              Send to GitHub
+              <span className="px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#f85149]/30 text-[10px] font-bold text-[#f85149] uppercase">
+                Author Mismatch
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={handleSendToGithub}
+              disabled={isSending}
+              className="px-5 py-2.5 rounded-lg bg-accent-green text-black font-black hover:bg-[#3fb950] transition-all text-[14px] flex items-center gap-2 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
+              Send to GitHub
+            </button>
+          )}
 
           <a
             href={`https://github.com/${data.author}/${data.repository}/commit/${data.commitHash}`}

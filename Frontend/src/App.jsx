@@ -127,6 +127,7 @@ function AppContent() {
   const [showCreateProfile, setShowCreateProfile] = useState(false);
   const [currentRoute, setCurrentRoute] = useState('home');
   const [prefilledUsername, setPrefilledUsername] = useState('');
+  const [githubAuthUsername, setGithubAuthUsername] = useState(null);
 
   // Ref to the result section for auto-scroll
   const resultRef = useRef(null);
@@ -181,8 +182,7 @@ function AppContent() {
         .then((res) => {
           if (res.success && res.username) {
             toast.success(`Authenticated as ${res.username}`, { id: toastId });
-            setPrefilledUsername(res.username);
-            setShowCreateProfile(true);
+            setGithubAuthUsername(res.username);
           } else {
             toast.error('GitHub authentication failed', { id: toastId });
           }
@@ -193,6 +193,22 @@ function AppContent() {
         });
     }
   }, []);
+
+  // ─── Decide whether to show Create Profile Modal after GitHub Auth ───────
+  useEffect(() => {
+    if (githubAuthUsername && profileChecked) {
+      if (profile && profile.githubUsername) {
+        // User already has an on-chain profile mapped. Do not show modal.
+        // We just refreshed their GitHub token in the backend.
+        setGithubAuthUsername(null);
+      } else if (!profile) {
+        // User does not have an on-chain profile yet.
+        setPrefilledUsername(githubAuthUsername);
+        setShowCreateProfile(true);
+        setGithubAuthUsername(null);
+      }
+    }
+  }, [githubAuthUsername, profileChecked, profile]);
 
   const handleAnalyze = async (githubUrl) => {
     setIsLoading(true);

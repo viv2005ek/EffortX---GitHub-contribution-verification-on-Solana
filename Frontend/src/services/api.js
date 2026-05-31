@@ -35,4 +35,9 @@ export const exchangeGithubCode = async (code) => {
   return response.data;
 };
 
+export const sendReportToGithub = async (githubUrl, reportMarkdown, githubUsername) => {
+  const response = await api.post('/comment', { githubUrl, reportMarkdown, githubUsername });
+  return response.data;
+};
+
 export default api;

@@ -17,12 +17,17 @@ export default function StoreProofButton({ analysisData }) {
   const githubUrl = analysisData?.githubUrl || '';
   const effortScore = Math.round(analysisData?.effortScore || 0);
   const rewardCoins = Math.round(analysisData?.rewardCoins || 1);
+  const commitAuthor = analysisData?.author || '';
+  const myUsername = profile?.githubUsername || '';
+
+  const isAuthorMismatch = !!(commitAuthor && myUsername && commitAuthor.toLowerCase() !== myUsername.toLowerCase());
 
   const canStore =
     isWalletConnected &&
     !!profile &&
     commitHash.length > 0 &&
-    effortScore > 0;
+    effortScore > 0 &&
+    !isAuthorMismatch;
 
   const handleStore = async () => {
     if (!canStore || loading || stored) return;
@@ -106,6 +111,22 @@ export default function StoreProofButton({ analysisData }) {
         Store Proof On-Chain
         <span className="px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#30363d] text-[10px] font-bold text-[#8b949e] uppercase">
           Create profile
+        </span>
+      </button>
+    );
+  }
+
+  if (isAuthorMismatch) {
+    return (
+      <button
+        disabled
+        className="px-5 py-2.5 rounded-lg bg-[#161b22] border border-[#30363d] text-[14px] font-semibold text-[#8b949e] flex items-center gap-2 cursor-not-allowed shadow-sm"
+        title={`This commit belongs to @${commitAuthor}, not @${myUsername}`}
+      >
+        <Shield className="w-4 h-4" />
+        Store Proof On-Chain
+        <span className="px-2 py-0.5 rounded-md bg-[#0d1117] border border-[#f85149]/30 text-[10px] font-bold text-[#f85149] uppercase">
+          Author Mismatch
         </span>
       </button>
     );
