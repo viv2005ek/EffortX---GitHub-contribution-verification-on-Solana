@@ -62,6 +62,7 @@ EffortX is a decentralized, AI-powered platform designed to analyze, score, and 
 EffortX bridges the gap between activity and impact by leveraging AI to analyze the *substance* of commits and PRs, and blockchain to store the verified results.
 
 **Complete User Flow:**
+
 1. **Connect Wallet:** User links their Solana wallet (e.g., Phantom).
 2. **Connect GitHub:** User authenticates via GitHub OAuth to establish identity.
 3. **Install GitHub App:** User installs the EffortX GitHub App to grant repo access.
@@ -128,6 +129,7 @@ flowchart TD
 ## Tech Stack
 
 **Frontend:**
+
 - React (Vite)
 - TypeScript/JavaScript
 - Tailwind CSS (Custom Design System)
@@ -135,23 +137,28 @@ flowchart TD
 - `@solana/wallet-adapter`
 
 **Backend:**
+
 - Node.js
 - Express.js
 - Axios (External API calls)
 
 **AI:**
+
 - Google Gemini 2.5 Flash
 - Dappier Premium Models (Finance, News, Research)
 
 **Storage:**
+
 - Redis (Session & Token caching)
 
 **Blockchain:**
+
 - Solana (Devnet/Mainnet)
 - Anchor Framework
 - Web3.js
 
 **Integrations:**
+
 - GitHub OAuth App (User Identity)
 - GitHub App (Repository Access)
 
@@ -231,24 +238,29 @@ EffortX/
 ## Local Development Setup
 
 ### Prerequisites
+
 - Node.js (v18+)
 - Redis Server running locally (or via Docker)
 - Solana CLI & Wallet (Phantom recommended)
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/viv2005ek/EffortX.git
 cd EffortX
 ```
 
 ### 2. Run Redis
+
 Ensure Redis is running on `redis://127.0.0.1:6379`.
+
 ```bash
 # Example using Docker
 docker run -d -p 6379:6379 redis
 ```
 
 ### 3. Setup Backend
+
 ```bash
 cd commit-analyzer-offchain
 npm install
@@ -257,6 +269,7 @@ npm run dev
 ```
 
 ### 4. Setup Frontend
+
 ```bash
 cd ../Frontend
 npm install
@@ -270,27 +283,16 @@ The app will be available at `http://localhost:5173`.
 ## Environment Variables
 
 ### Backend (`commit-analyzer-offchain/.env`)
+
 ```env
-# Server
-PORT=3000
-
-# Redis Configuration
-REDIS_URL=redis://127.0.0.1:6379
-
-# GitHub OAuth App (Identity)
-GITHUB_CLIENT_ID=your_oauth_client_id
-GITHUB_CLIENT_SECRET=your_oauth_client_secret
-
-# GitHub App (Bot/Permissions)
-GITHUB_APP_ID=your_app_id
-GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
-
-# AI Models
+PORT=5000
+GITHUB_TOKEN=your_github_token
 GEMINI_API_KEY=your_gemini_api_key
 DAPPIER_API_KEY=your_dappier_api_key
-
-# Frontend URL for CORS
-FRONTEND_URL=http://localhost:5173
+NODE_ENV=development
+GITHUB_CLIENT_ID=your_oauth_client_id
+GITHUB_CLIENT_SECRET=your_oauth_client_secret
+REDIS_URL=redis://127.0.0.1:6379
 ```
 
 ---
@@ -298,30 +300,41 @@ FRONTEND_URL=http://localhost:5173
 ## API Overview
 
 ### Auth Routes (`/api/auth`)
+
 - `POST /github/exchange` - Exchanges OAuth code for GitHub username and caches token in Redis.
 
 ### Analysis Routes (`/api/analysis`)
+
 - `POST /analyze` - Accepts a GitHub URL, verifies repo access via GitHub App, fetches diff, runs Gemini AI, and posts a review.
 
 ### Playground Routes (`/api/playground`)
+
 - `POST /dappier/chat` - Proxies requests to Dappier models after verifying ECOIN payment on the frontend.
 
 ### Webhooks Routes (`/api/webhooks`)
+
 - `POST /github` - Receives GitHub App installation events.
 
 ---
 
-## Screenshots Section
+## Demo & Screenshots
 
-> *Note: Add screenshots of your application here.*
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=obsvaDMGX60" target="_blank">
+    <img src="https://img.youtube.com/vi/obsvaDMGX60/maxresdefault.jpg" alt="EffortX YouTube Demo" width="800" style="border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.1);" />
+  </a>
+  <br/>
+  <p><b>📺 Watch the full EffortX Demo on YouTube</b></p>
+</div>
 
+<br />
 | Landing Page | Dashboard |
 |:---:|:---:|
-| *(Placeholder for Landing Page)* | *(Placeholder for Dashboard)* |
+| ![Landing Page](ReadmeImages/image.png) | ![Dashboard](ReadmeImages/image-1.png) |
 
 | Analysis Report | AI Playground |
 |:---:|:---:|
-| *(Placeholder for Analysis Report)* | *(Placeholder for Playground)* |
+| ![Analysis Report](ReadmeImages/image-2.png) | ![AI Playground](ReadmeImages/image-3.png) |
 
 ---
 
@@ -338,11 +351,13 @@ FRONTEND_URL=http://localhost:5173
 ## Roadmap
 
 **Near-term:**
+
 - [ ] **GitHub Check Runs**: Automatically run EffortX analysis as a CI/CD check on PRs.
 - [ ] **Organization Dashboards**: Aggregated metrics for engineering teams.
 - [ ] **Expanded Multi-Model Support**: Integrate Claude 3 and GPT-4o into the analysis pipeline.
 
 **Long-term:**
+
 - [ ] **Developer Reputation Network**: A decentralized protocol for identity and skill verification.
 - [ ] **Recruiter Portal**: A dedicated UI for hiring managers to query verifiable candidate skills.
 - [ ] **Reputation APIs**: Allow third-party job boards to integrate EffortX scores.
@@ -351,7 +366,7 @@ FRONTEND_URL=http://localhost:5173
 
 ## Contributing
 
-We welcome contributions from the community! 
+We welcome contributions from the community!
 
 1. **Star and Fork** the repository.
 2. Create a new branch (`git checkout -b feature/amazing-feature`).
@@ -369,8 +384,9 @@ Please ensure your code passes all linting and includes appropriate tests.
 Creator & Lead Developer
 
 - [GitHub](https://github.com/viv2005ek)
-- [LinkedIn](https://linkedin.com/in/viv2005ek)
-- [X (Twitter)](https://x.com/EffortX05)
+- [LinkedIn](https://www.linkedin.com/in/vivek-kumar-garg-097677280/)
+- [X (EffortX Official)](https://x.com/EffortX05)
+- [X (Creator)](https://x.com/viv2005ek)
 
 ---
 
