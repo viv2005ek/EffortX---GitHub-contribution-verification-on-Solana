@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { getRedisClient } = require('../utils/redisClient');
 
 
 exports.getGithubAuthUrl = (req, res) => {
@@ -61,6 +62,21 @@ exports.githubAuth = async (req, res) => {
 
     if (!username) {
       return res.status(400).json({ success: false, error: 'Failed to retrieve GitHub username' });
+    }
+
+    // Store token in Redis mapped to the username
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        // Store for 30 days (or adjust as needed)
+        const expirationSeconds = 60 * 60 * 24 * 30;
+        await redisClient.setEx(`github_token:${username}`, expirationSeconds, accessToken);
+      } catch (redisErr) {
+        console.error('Failed to store token in Redis:', redisErr.message);
+        // We still continue even if Redis fails, but log it
+      }
+    } else {
+      console.warn('Redis client not initialized, token not stored');
     }
 
     res.json({ success: true, username: username });
