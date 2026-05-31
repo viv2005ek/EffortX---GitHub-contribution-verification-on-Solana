@@ -4,6 +4,7 @@ import { AtSign as Github, Loader2, CheckCircle2, X, User } from 'lucide-react';
 import { useSolana } from '../context/SolanaContext.jsx';
 import { createProfile, parseBlockchainError } from '../solana/program.js';
 import { explorerTxUrl } from '../solana/config.js';
+import { getGithubAuthUrl } from '../services/api';
 import toast from 'react-hot-toast';
 
 // ============================================================
@@ -11,14 +12,39 @@ import toast from 'react-hot-toast';
 // Shown when wallet is connected but no on-chain profile exists.
 // ============================================================
 
-export default function CreateProfileModal({ isOpen, onClose }) {
+export default function CreateProfileModal({ isOpen, onClose, prefilledUsername }) {
   const { wallet, refreshProfile } = useSolana();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(prefilledUsername || '');
   const [loading, setLoading] = useState(false);
   const [txSig, setTxSig] = useState(null);
   const [done, setDone] = useState(false);
 
+  // Sync state if prefilledUsername changes
+  React.useEffect(() => {
+    if (prefilledUsername) {
+      setUsername(prefilledUsername);
+    }
+  }, [prefilledUsername]);
+
   const isValidUsername = username.trim().length > 0 && username.trim().length <= 32;
+
+  const handleGithubSignIn = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { url } = await getGithubAuthUrl();
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error('Failed to get GitHub Auth URL');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Error initiating GitHub auth');
+      setLoading(false);
+    }
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -126,61 +152,75 @@ export default function CreateProfileModal({ isOpen, onClose }) {
                     )}
                   </motion.div>
                 ) : (
-                  <form onSubmit={handleCreate} className="space-y-5">
+                  <form onSubmit={prefilledUsername ? handleCreate : handleGithubSignIn} className="space-y-5">
                     {/* Info box */}
                     <div className="rounded-xl bg-white/3 border border-white/8 p-4">
                       <p className="text-xs text-text-main/50 leading-relaxed">
-                        This creates two on-chain accounts (UserProfile + UsernameIndex) on Solana Devnet.
-                        A small rent fee (~0.002 SOL) will be charged from your wallet.
+                        {prefilledUsername 
+                          ? "This securely maps your GitHub identity to your wallet by creating a unique on-chain account on Solana Devnet. A small rent fee (~0.001 SOL) will be charged from your wallet."
+                          : "To securely map your identity to your wallet, please authenticate with GitHub first. Then, a unique on-chain profile will be created on Solana Devnet."}
                       </p>
                     </div>
 
-                    {/* Username input */}
-                    <div>
-                      <label className="text-xs font-bold text-text-main/40 uppercase tracking-wider mb-2 block">
-                        GitHub Username
-                      </label>
-                      <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                          <Github className="w-4 h-4 text-text-main/30" />
+                    {/* Username input (only shown if NOT authenticated) - Actually we only authenticate via GitHub now! */}
+                    {prefilledUsername ? (
+                      <div className="text-center py-4 bg-[#24292e]/50 rounded-xl border border-[#30363d]">
+                        <p className="text-xs text-text-main/60 mb-1">Authenticated as</p>
+                        <div className="flex items-center justify-center gap-2 text-white font-bold text-lg">
+                          <Github className="w-5 h-5 text-accent-green" />
+                          {username}
                         </div>
-                        <input
-                          type="text"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value.replace(/\s/g, ''))}
-                          placeholder="your-github-username"
-                          maxLength={32}
-                          disabled={loading}
-                          className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-[#30363d] border border-[#30363d] text-white placeholder:text-text-main/25 focus:outline-none focus:border-accent-green/50 transition-all text-sm font-mono disabled:opacity-50"
-                          autoFocus
-                        />
                       </div>
-                      <p className="text-[10px] text-text-main/30 mt-1.5 text-right">
-                        {username.length}/32
-                      </p>
-                    </div>
+                    ) : null}
 
                     {/* Submit button */}
-                    <motion.button
-                      type="submit"
-                      disabled={!isValidUsername || loading}
-                      whileHover={isValidUsername && !loading ? { scale: 1.02 } : {}}
-                      whileTap={isValidUsername && !loading ? { scale: 0.98 } : {}}
-                      className={`w-full py-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all duration-300 ${
-                        isValidUsername && !loading
-                          ? 'bg-accent-green text-white shadow-glow hover:bg-[#3fb950]'
-                          : 'bg-[#30363d] text-text-main/30 cursor-not-allowed'
-                      }`}
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Creating Profile…
-                        </>
-                      ) : (
-                        'Create Profile On-Chain'
-                      )}
-                    </motion.button>
+                    {prefilledUsername ? (
+                      <motion.button
+                        type="submit"
+                        disabled={!isValidUsername || loading}
+                        whileHover={isValidUsername && !loading ? { scale: 1.02 } : {}}
+                        whileTap={isValidUsername && !loading ? { scale: 0.98 } : {}}
+                        className={`w-full py-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all duration-300 ${
+                          isValidUsername && !loading
+                            ? 'bg-accent-green text-white shadow-glow hover:bg-[#3fb950]'
+                            : 'bg-[#30363d] text-text-main/30 cursor-not-allowed'
+                        }`}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Mapping Identity…
+                          </>
+                        ) : (
+                          `Link @${username} to Wallet`
+                        )}
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        type="submit"
+                        disabled={loading}
+                        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"' }}
+                        whileHover={!loading ? { scale: 1.02 } : {}}
+                        whileTap={!loading ? { scale: 0.98 } : {}}
+                        className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-300 ${
+                          !loading
+                            ? 'bg-[#24292e] text-white hover:bg-[#2f363d] border border-[#1b1f23]/50'
+                            : 'bg-[#30363d] text-text-main/30 cursor-not-allowed'
+                        }`}
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Connecting to GitHub…
+                          </>
+                        ) : (
+                          <>
+                            <Github className="w-5 h-5" />
+                            Sign in with GitHub
+                          </>
+                        )}
+                      </motion.button>
+                    )}
                   </form>
                 )}
               </div>

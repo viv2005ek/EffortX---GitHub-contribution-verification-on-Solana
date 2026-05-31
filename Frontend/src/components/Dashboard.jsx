@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import {
-  Layout, BarChart3, Trophy, History, Activity, 
-  Wallet, Coins, ShieldCheck, ArrowUpRight, Send, 
+  Layout, BarChart3, Trophy, History, Activity,
+  Wallet, Coins, ShieldCheck, ArrowUpRight, Send,
   ExternalLink, Code2 as Github, FileText, CheckCircle2, ChevronRight, X
 } from 'lucide-react';
 import { useSolana } from '../context/SolanaContext.jsx';
@@ -16,7 +17,7 @@ import toast from 'react-hot-toast';
 
 const AnimatedCounter = ({ value, prefix = "", suffix = "" }) => {
   const ref = useRef(null);
-  
+
   // Extract number from string if needed (e.g. "#4" -> 4)
   const cleanVal = value !== null && value !== undefined ? value.toString() : "";
   const num = parseFloat(cleanVal.replace(/[^0-9.]/g, ''));
@@ -172,7 +173,7 @@ export default function Dashboard() {
   const handleTouchEnd = (e) => {
     const diffX = e.changedTouches[0].clientX - touchStartX.current;
     const diffY = e.changedTouches[0].clientY - touchStartY.current;
-    
+
     // Check if horizontal swipe was dominant and long enough
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
       const tabSequence = ['overview', 'stats', 'leaderboard', 'proofs', 'activity'];
@@ -212,16 +213,16 @@ export default function Dashboard() {
       <div className="w-full md:w-72 shrink-0">
         <div className="sticky top-28 space-y-6">
           {/* User Brief */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="glass-card rounded-3xl p-6 relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-[#238636]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
+
             <div className="relative z-10">
               <div className="flex items-center gap-4 mb-6">
-                <motion.div 
+                <motion.div
                   whileHover={{ rotate: 10, scale: 1.05 }}
                   className="w-14 h-14 rounded-2xl bg-[#161b22] border border-[#30363d] flex items-center justify-center text-[#3fb950] font-black text-2xl shadow-[0_0_15px_rgba(46,160,67,0.2)]"
                 >
@@ -235,7 +236,7 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="p-4 rounded-2xl bg-black/40 border border-[#30363d] space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-text-main/50 uppercase tracking-wider font-semibold">Global Rank</span>
@@ -263,15 +264,14 @@ export default function Dashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 group overflow-hidden ${
-                    isActive 
-                      ? 'text-white' 
+                  className={`relative w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 group overflow-hidden ${isActive
+                      ? 'text-white'
                       : 'text-text-main/50 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {isActive && (
-                    <motion.div 
-                      layoutId="activeTabBg" 
+                    <motion.div
+                      layoutId="activeTabBg"
                       className="absolute inset-0 bg-white/10 border border-[#30363d] rounded-2xl"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
@@ -291,7 +291,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Area with Touch Swiping */}
-      <div 
+      <div
         className="flex-1 min-w-0"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -380,7 +380,7 @@ function OverviewTab({ profile, userRank, refreshProfile, wallet }) {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
-  
+
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0.3 } }
@@ -433,9 +433,9 @@ function OverviewTab({ profile, userRank, refreshProfile, wallet }) {
                   )}
                 </AnimatePresence>
               </div>
-              <RippleButton 
-                type="submit" 
-                disabled={txLoading || !solInput} 
+              <RippleButton
+                type="submit"
+                disabled={txLoading || !solInput}
                 className="w-full py-4 rounded-2xl font-black bg-accent-green text-black hover:bg-[#3fb950] transition-all disabled:opacity-50 shadow-glow cursor-pointer"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
@@ -476,9 +476,9 @@ function OverviewTab({ profile, userRank, refreshProfile, wallet }) {
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-text-main/50 pointer-events-none">ECOIN</div>
                 </div>
               </div>
-              <RippleButton 
-                type="submit" 
-                disabled={txLoading || !transferTo || !transferAmount} 
+              <RippleButton
+                type="submit"
+                disabled={txLoading || !transferTo || !transferAmount}
                 className="w-full py-4 rounded-2xl font-black bg-white/10 text-white hover:bg-white/20 transition-all disabled:opacity-50 border border-[#30363d] cursor-pointer"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
@@ -498,19 +498,19 @@ function OverviewTab({ profile, userRank, refreshProfile, wallet }) {
 
 function StatsTab({ profile, userProofs }) {
   const highestScore = userProofs.length > 0 ? Math.max(...userProofs.map(p => p.effortScore)) : 0;
-  
+
   return (
     <div className="space-y-6">
       <div className="glass-card p-10 rounded-[2rem] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-        
+
         <h3 className="text-2xl font-black text-white mb-8 flex items-center gap-3 relative z-10">
           <div className="w-10 h-10 rounded-xl bg-accent-green/20 border border-accent-green/30 flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-accent-green" />
           </div>
           Contribution Analytics
         </h3>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
           {[
             { label: 'Total Analyzed', value: profile.totalProofs, sub: 'Commits & PRs', color: 'text-white' },
@@ -518,7 +518,7 @@ function StatsTab({ profile, userProofs }) {
             { label: 'Avg Score', value: profile.averageScore, sub: 'Out of 100', color: 'text-blue-400' },
             { label: 'Best Score', value: highestScore, sub: 'All time high', color: 'text-purple-400' },
           ].map((stat, i) => (
-            <motion.div 
+            <motion.div
               key={i}
               whileHover={{ y: -5, scale: 1.02 }}
               className="p-6 rounded-3xl bg-black/40 border border-[#30363d] shadow-inner "
@@ -532,9 +532,9 @@ function StatsTab({ profile, userProofs }) {
           ))}
         </div>
       </div>
-      
+
       {/* Chart Placeholder */}
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.01 }}
         className="glass-card p-10 rounded-[2rem] h-72 flex flex-col items-center justify-center text-center relative overflow-hidden group"
       >
@@ -551,14 +551,14 @@ function StatsTab({ profile, userProofs }) {
 function LeaderboardTab({ leaderboard, wallet }) {
   const [mode, setMode] = useState('effort');
 
-  const ecoinList = leaderboard; 
+  const ecoinList = leaderboard;
 
   const effortList = useMemo(() => {
     if (!leaderboard.length) return [];
     const sorted = [...leaderboard].sort((a, b) => {
-      if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore; 
-      if (b.totalProofs !== a.totalProofs) return b.totalProofs - a.totalProofs;     
-      return b.totalXp - a.totalXp;                                                  
+      if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
+      if (b.totalProofs !== a.totalProofs) return b.totalProofs - a.totalProofs;
+      return b.totalXp - a.totalXp;
     });
     return sorted.map((u, i) => ({ ...u, effortRank: i + 1 }));
   }, [leaderboard]);
@@ -600,8 +600,8 @@ function LeaderboardTab({ leaderboard, wallet }) {
             {mode === 'effort' ? 'Contribution Leaderboard' : 'ECOIN Leaderboard'}
           </h3>
           <p className="text-sm text-text-main/40 mt-1 font-medium">
-            {mode === 'effort' 
-              ? 'Ranked by engineering quality and proof consistency.' 
+            {mode === 'effort'
+              ? 'Ranked by engineering quality and proof consistency.'
               : 'Ranked by ECOIN holdings and community XP.'}
           </p>
         </div>
@@ -613,7 +613,7 @@ function LeaderboardTab({ leaderboard, wallet }) {
             layoutId="leaderboardModePill"
             transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
             className="absolute top-1 h-[calc(100%-8px)] rounded-lg bg-[#30363d] shadow-sm"
-            style={{ 
+            style={{
               left: mode === 'effort' ? '4px' : 'auto',
               right: mode === 'ecoin' ? '4px' : 'auto',
               width: 'calc(50% - 4px)'
@@ -622,17 +622,15 @@ function LeaderboardTab({ leaderboard, wallet }) {
 
           <button
             onClick={() => setMode('effort')}
-            className={`relative z-10 px-6 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              mode === 'effort' ? 'text-white' : 'text-text-main/40 hover:text-text-main/60'
-            }`}
+            className={`relative z-10 px-6 py-2 text-xs font-bold transition-colors cursor-pointer ${mode === 'effort' ? 'text-white' : 'text-text-main/40 hover:text-text-main/60'
+              }`}
           >
             Ref. Effort
           </button>
           <button
             onClick={() => setMode('ecoin')}
-            className={`relative z-10 px-6 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              mode === 'ecoin' ? 'text-white' : 'text-text-main/40 hover:text-text-main/60'
-            }`}
+            className={`relative z-10 px-6 py-2 text-xs font-bold transition-colors cursor-pointer ${mode === 'ecoin' ? 'text-white' : 'text-text-main/40 hover:text-text-main/60'
+              }`}
           >
             ECOIN
           </button>
@@ -683,26 +681,23 @@ function LeaderboardTab({ leaderboard, wallet }) {
                   <motion.tr
                     variants={listItemVariants}
                     key={`${user.wallet}-${mode}`}
-                    className={`border-b border-[#30363d]/50 transition-colors ${
-                      isMe ? 'bg-accent-green/[0.03]' : 'hover:bg-white/[0.02]'
-                    }`}
+                    className={`border-b border-[#30363d]/50 transition-colors ${isMe ? 'bg-accent-green/[0.03]' : 'hover:bg-white/[0.02]'
+                      }`}
                   >
                     <td className="p-6 pl-8">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border ${
-                        rank === 1 ? 'border-yellow-400/30 text-yellow-400 bg-yellow-400/5 shadow-[0_0_10px_rgba(250,204,21,0.1)]' :
-                        rank === 2 ? 'border-gray-400/30 text-gray-300 bg-gray-400/5' :
-                        rank === 3 ? 'border-amber-700/30 text-amber-600 bg-amber-700/5' :
-                        'border-transparent text-text-main/30'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border ${rank === 1 ? 'border-yellow-400/30 text-yellow-400 bg-yellow-400/5 shadow-[0_0_10px_rgba(250,204,21,0.1)]' :
+                          rank === 2 ? 'border-gray-400/30 text-gray-300 bg-gray-400/5' :
+                            rank === 3 ? 'border-amber-700/30 text-amber-600 bg-amber-700/5' :
+                              'border-transparent text-text-main/30'
+                        }`}>
                         {rank}
                       </div>
                     </td>
 
                     <td className="p-6">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${
-                          isMe ? 'bg-accent-green/10 border-accent-green/20 text-accent-green' : 'bg-[#30363d]/50 border-[#30363d] text-white/70'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border ${isMe ? 'bg-accent-green/10 border-accent-green/20 text-accent-green' : 'bg-[#30363d]/50 border-[#30363d] text-white/70'
+                          }`}>
                           {user.githubUsername[0].toUpperCase()}
                         </div>
                         <span className={`font-bold text-sm ${isMe ? 'text-accent-green' : 'text-white/90'}`}>
@@ -783,7 +778,7 @@ function ProofsTab({ proofs, onSelectProof, refreshProfile }) {
 
   return (
     <PullToRefresh onRefresh={refreshProfile}>
-      <motion.div 
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -798,7 +793,7 @@ function ProofsTab({ proofs, onSelectProof, refreshProfile }) {
             className="glass-card p-6 rounded-3xl cursor-pointer hover:border-accent-green/40 hover:shadow-[0_8px_30px_rgba(46,160,67,0.15)] transition-all duration-300 group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-48 h-48 bg-accent-green/10 rounded-full blur-[60px] -mr-24 -mt-24 group-hover:bg-accent-green/20 transition-all duration-500 pointer-events-none" />
-            
+
             <div className="flex justify-between items-start mb-6 relative z-10">
               <div>
                 <div className="flex items-center gap-2 mb-2">
@@ -815,7 +810,7 @@ function ProofsTab({ proofs, onSelectProof, refreshProfile }) {
                 </span>
               </div>
             </div>
-            
+
             <div className="flex gap-6 relative z-10 p-5 rounded-2xl bg-black/30 border border-[#30363d]">
               <div>
                 <p className="text-[10px] text-text-main/50 uppercase tracking-widest font-bold mb-1.5">Effort Score</p>
@@ -831,7 +826,7 @@ function ProofsTab({ proofs, onSelectProof, refreshProfile }) {
                 </p>
               </div>
               <div className="ml-auto mt-auto">
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 45 }}
                   className="w-10 h-10 rounded-xl bg-[#30363d] flex items-center justify-center group-hover:bg-accent-green group-hover:text-black transition-colors duration-300 shadow-sm border border-[#30363d] group-hover:border-transparent"
                 >
@@ -855,7 +850,7 @@ function ActivityTab({ proofs, profile }) {
       reward: p.rewardCoins,
       timestamp: p.timestamp
     }));
-    
+
     if (profile) {
       list.push({
         type: 'creation',
@@ -865,7 +860,7 @@ function ActivityTab({ proofs, profile }) {
         timestamp: profile.createdAt || 0
       });
     }
-    
+
     return list.sort((a, b) => b.timestamp - a.timestamp);
   }, [proofs, profile]);
 
@@ -885,30 +880,30 @@ function ActivityTab({ proofs, profile }) {
   return (
     <div className="glass-card p-10 rounded-[2rem] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-blue/5 rounded-full blur-[100px] pointer-events-none" />
-      
+
       <h3 className="text-2xl font-black text-white mb-10 flex items-center gap-3 relative z-10">
         <div className="w-10 h-10 rounded-xl bg-[#238636]/20 border border-[#3fb950]/30 flex items-center justify-center shadow-[0_0_15px_rgba(46,160,67,0.2)]">
           <Activity className="w-5 h-5 text-[#3fb950]" />
         </div>
         Activity Timeline
       </h3>
-      
-      <motion.div 
+
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
         className="space-y-8 relative z-10 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-[#30363d]"
       >
         {events.map((event, i) => (
-          <motion.div 
+          <motion.div
             variants={itemVariants}
-            key={i} 
+            key={i}
             className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group"
           >
             <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 ${event.type === 'proof' ? 'border-[#3fb950] bg-[#238636]/10 text-[#3fb950] shadow-[0_0_15px_rgba(46,160,67,0.3)]' : 'border-[#2ea043] bg-[#2ea043]/10 text-[#2ea043] shadow-[0_0_15px_rgba(46,160,67,0.3)]'} shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform duration-300 group-hover:scale-110`}>
               {event.type === 'proof' ? <CheckCircle2 className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
             </div>
-            
+
             <div className="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] p-6 rounded-3xl bg-[#161b22] border border-[#30363d] hover:border-[#3fb950]/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-base font-black text-white">{event.title}</h4>
@@ -954,7 +949,7 @@ function ProofModal({ proof, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-background/80 "
@@ -988,7 +983,7 @@ function ProofModal({ proof, onClose }) {
             <p className="text-[10px] text-text-main/50 uppercase tracking-widest font-bold mb-2">Commit Hash</p>
             <p className="text-sm font-mono text-white/90 break-all bg-black/50 p-3 rounded-xl border border-[#30363d]">{proof.commitHash}</p>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-black/40 rounded-2xl p-5 border border-[#30363d]">
               <p className="text-[10px] text-text-main/50 uppercase tracking-widest font-bold mb-2">Effort Score</p>
@@ -1003,7 +998,7 @@ function ProofModal({ proof, onClose }) {
               </p>
             </div>
           </div>
-          
+
           <div className="bg-black/40 rounded-2xl p-5 border border-[#30363d]">
             <p className="text-[10px] text-text-main/50 uppercase tracking-widest font-bold mb-2">Timestamp</p>
             <p className="text-sm text-white font-medium bg-black/50 p-3 rounded-xl border border-[#30363d] inline-block">

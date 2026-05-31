@@ -10,7 +10,7 @@ import HowItWorks from './components/HowItWorks';
 import WalletButton from './components/WalletButton';
 import CreateProfileModal from './components/CreateProfileModal';
 import AnimatedBackground from './components/AnimatedBackground';
-import { analyzeCommit } from './services/api';
+import { analyzeCommit, exchangeGithubCode } from './services/api';
 import { useSolana } from './context/SolanaContext.jsx';
 import { initializeProtocol } from './solana/program.js';
 import toast from 'react-hot-toast';
@@ -126,6 +126,7 @@ function AppContent() {
   const [error, setError] = useState(null);
   const [showCreateProfile, setShowCreateProfile] = useState(false);
   const [currentRoute, setCurrentRoute] = useState('home');
+  const [prefilledUsername, setPrefilledUsername] = useState('');
 
   // Ref to the result section for auto-scroll
   const resultRef = useRef(null);
@@ -166,6 +167,32 @@ function AppContent() {
       setShowCreateProfile(false);
     }
   }, [isWalletConnected]);
+
+  // ─── Handle GitHub OAuth Redirect ──────────────────────────────────────────
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+      const toastId = toast.loading('Authenticating with GitHub...');
+      // Remove code from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      exchangeGithubCode(code)
+        .then((res) => {
+          if (res.success && res.username) {
+            toast.success(`Authenticated as ${res.username}`, { id: toastId });
+            setPrefilledUsername(res.username);
+            setShowCreateProfile(true);
+          } else {
+            toast.error('GitHub authentication failed', { id: toastId });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error('Error authenticating with GitHub', { id: toastId });
+        });
+    }
+  }, []);
 
   const handleAnalyze = async (githubUrl) => {
     setIsLoading(true);
@@ -430,7 +457,11 @@ function AppContent() {
       {/* ── Create Profile Modal ───────────────────────────────────────────────── */}
       <CreateProfileModal
         isOpen={showCreateProfile}
-        onClose={() => setShowCreateProfile(false)}
+        onClose={() => {
+          setShowCreateProfile(false);
+          setPrefilledUsername('');
+        }}
+        prefilledUsername={prefilledUsername}
       />
     </div>
   );

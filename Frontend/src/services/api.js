@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://effortx-commit-analyzer.vercel.app/api',
+  //baseURL: 'https://effortx-commit-analyzer.vercel.app/api',
+  baseURL: 'http://localhost:5000/api',
 });
 
 export const analyzeCommit = async (githubUrl) => {
@@ -21,6 +22,16 @@ export const chatWithPlayground = async (messages, walletAddress, model) => {
 
 export const chatWithDappier = async (modelId, query, walletAddress) => {
   const response = await api.post('/playground/dappier', { modelId, query, walletAddress });
+  return response.data;
+};
+
+export const getGithubAuthUrl = async () => {
+  const response = await api.get('/auth/github/url');
+  return response.data;
+};
+
+export const exchangeGithubCode = async (code) => {
+  const response = await api.post('/auth/github', { code });
   return response.data;
 };
 
