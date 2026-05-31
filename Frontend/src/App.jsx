@@ -352,6 +352,16 @@ function AppContent() {
             GitHub
           </motion.a>
 
+          <motion.a
+            whileHover={{ scale: 1.05, y: -1 }}
+            href="https://x.com/EffortX05"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors cursor-pointer"
+          >
+            Our Journey
+          </motion.a>
+
           <WalletButton />
 
           {/* Nudge badge: connected but no profile and check completed */}
