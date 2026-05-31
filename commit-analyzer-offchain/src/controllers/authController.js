@@ -65,7 +65,7 @@ exports.githubAuth = async (req, res) => {
     }
 
     // Store token in Redis mapped to the username
-    const redisClient = getRedisClient();
+    const redisClient = await getRedisClient();
     if (redisClient) {
       try {
         // Store for 30 days (or adjust as needed)
@@ -89,7 +89,7 @@ exports.githubAuth = async (req, res) => {
 exports.checkGithubStatus = async (req, res) => {
   try {
     const { username } = req.params;
-    const redisClient = getRedisClient();
+    const redisClient = await getRedisClient();
     if (!redisClient) {
       return res.json({ authenticated: false });
     }

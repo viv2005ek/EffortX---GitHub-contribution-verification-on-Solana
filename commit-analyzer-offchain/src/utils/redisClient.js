@@ -23,7 +23,12 @@ const initRedis = async () => {
   return redisClient;
 };
 
-const getRedisClient = () => redisClient;
+const getRedisClient = async () => {
+  if (!redisClient) {
+    await initRedis();
+  }
+  return redisClient;
+};
 
 module.exports = {
   initRedis,

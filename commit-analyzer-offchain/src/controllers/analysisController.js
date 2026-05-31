@@ -109,7 +109,7 @@ const commentOnGithub = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
-    const redisClient = getRedisClient();
+    const redisClient = await getRedisClient();
     if (!redisClient) {
       return res.status(500).json({ success: false, error: 'Redis client not initialized' });
     }
@@ -150,7 +150,7 @@ const commentOnGithub = async (req, res) => {
         // The token is invalid or expired. Delete it from Redis so it's not reused.
         try {
           const { githubUsername } = req.body;
-          const redisClient = getRedisClient();
+          const redisClient = await getRedisClient();
           if (redisClient) {
             await redisClient.del(`github_token:${githubUsername}`);
           }
