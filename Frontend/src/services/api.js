@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  //baseURL: 'https://effortx-commit-analyzer.vercel.app/api',
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://effortx-commit-analyzer.vercel.app/api',
+  // baseURL: 'http://localhost:5000/api',
 });
 
 export const analyzeCommit = async (githubUrl) => {
