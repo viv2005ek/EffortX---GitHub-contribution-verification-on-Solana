@@ -326,8 +326,8 @@ REDIS_URL=redis://127.0.0.1:6379
   <br/>
   <p><b>📺 Watch the full EffortX Demo on YouTube</b></p>
 </div>
-
 <br />
+
 | Landing Page | Dashboard |
 |:---:|:---:|
 | ![Landing Page](ReadmeImages/image.png) | ![Dashboard](ReadmeImages/image-1.png) |
