@@ -38,6 +38,7 @@
 - [Team](#team)
 
 ---
+EffortX Presentation: https://drive.google.com/file/d/1F8yp4l7ogptAA7AU9qrTkshdWqYqNt7b/view?usp=sharing
 
 ## Overview
 
