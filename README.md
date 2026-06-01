@@ -39,6 +39,7 @@
 
 ---
 EffortX Presentation: https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=sharing
+
 EffortX Document: https://docs.google.com/document/d/1euj_EaTQ9MYlRs-LcdBlGw-yLovbWCClQ0XBH_NFy54/edit?usp=sharing
 
 ## Overview
