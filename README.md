@@ -38,7 +38,7 @@
 - [Team](#team)
 
 ---
-EffortX Presentation: https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=sharing
+EffortX Presentation: [https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=sharing](https://drive.google.com/file/d/1jt_xbZYwvG2F8bjGJzduuhN6RkeKEK3m/view?usp=sharing)
 
 EffortX Document: https://docs.google.com/document/d/1euj_EaTQ9MYlRs-LcdBlGw-yLovbWCClQ0XBH_NFy54/edit?usp=sharing
 
