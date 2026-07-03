@@ -38,9 +38,26 @@
 - [Team](#team)
 
 ---
-EffortX Presentation: [https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=sharing](https://drive.google.com/file/d/1jt_xbZYwvG2F8bjGJzduuhN6RkeKEK3m/view?usp=sharing)
 
-EffortX Document: https://docs.google.com/document/d/1euj_EaTQ9MYlRs-LcdBlGw-yLovbWCClQ0XBH_NFy54/edit?usp=sharing
+
+Links And Resources:
+
+Live Website
+https://effort-x-seven.vercel.app/
+
+Demo 
+ https://www.youtube.com/watch?v=obsvaDMGX60
+
+Github
+https://github.com/viv2005ek/EffortX---GitHub-contribution-verification-on-Solana
+
+Presentation (PPT)
+https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=sharing
+
+EffortX Details Document:
+https://docs.google.com/document/d/1euj_EaTQ9MYlRs-LcdBlGw-yLovbWCClQ0XBH_NFy54/edit?usp=sharing
+
+
 
 ## Overview
 
