@@ -57,6 +57,9 @@ https://drive.google.com/file/d/1MF7-03Cyu7L1MSdAE0lbDUr6RnczowOx/view?usp=shari
 EffortX Details Document:
 https://docs.google.com/document/d/1euj_EaTQ9MYlRs-LcdBlGw-yLovbWCClQ0XBH_NFy54/edit?usp=sharing
 
+Effortx Build Journey:
+https://x.com/EffortX05
+
 
 
 ## Overview
